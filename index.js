@@ -323,6 +323,7 @@ client.on(Events.MessageCreate, msg => {
             const m = msg.guild.members.cache.get(id);
             return m ? `${m.displayName}님을 언급했어요.` : '누군가를 언급했어요.';
         })
+    .replace(/\*\*(.*?)\*\*/g, (_, t) => `${josa(t, '을/를')} 강조했어요.`);
     text = replaceall(text);
     
     if (msg.attachments.size > 0) {
