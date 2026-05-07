@@ -218,6 +218,45 @@ const commands = [
             .setDescription('목소리 높낮이 (-20 ~ 20)')
              .setMinValue(-20)
              .setMaxValue(20)
+        ),
+    new SlashCommandBuilder()
+        .setName('개발자')
+        .setDescription('개발자')
+        .addSubcommand(sub=>sub
+            .setName('공지')
+            .setDescription('공지를 보냅니다')
+            .addStringOption(o=>o
+                .setChoices(
+                    { name: '서버주인에게만', value:'onlyserverowner' },
+                    { name: '음성채널에', value: 'voicechannel'}
+                )
+                .setName('전송대상')
+                .setDescription('전송대상을 선택하세요')
+                .setRequired(true)
+            )
+            .addStringOption(o=>o
+                .setName('내용')
+                .setDescription('공지의 내용')
+                .setMinLength(1)
+                .setMaxLength(2000)
+                .setRequired(true)
+            )
+        )
+        .addSubcommand(sub=>sub
+            .setName('들어가')
+            .setDescription('특정채널에 봇을 강제로 참여시킵니다')
+            .addChannelOption(o=>o
+                .setName('음성채널')
+                .setDescription('들어갈 음성채널')
+                .addChannelTypes(ChannelType.GuildVoice,ChannelType.GuildStageVoice)
+                .setRequired(true)
+            )
+            .addChannelOption(o=>o
+                .setName('채팅채널')
+                .setDescription('읽어줄 일반채널')
+                .addChannelTypes(ChannelType.GuildText,ChannelType.PublicThread,ChannelType.PrivateThread, ChannelType.GuildVoice, ChannelType.GuildStageVoice)
+                .setRequired(true)
+            )
         )
 ]
 
@@ -306,6 +345,58 @@ client.on(Events.InteractionCreate, async i => {
             }
             await saveUserConfig(i.guild.id,i.user.id,JSON.parse(data)[code]);
             await i.editReply(`적용이 끝났습니다.`)
+        }
+    }
+        if (i.commandName === '개발자') {
+        if (i.user.id === process.env.devId)
+        switch (i.options.getSubcommand()) {
+            case "공지":{
+                await i.deferReply({flags:["Ephemeral"]});
+                let count = 0;
+                if (i.options.getString('전송대상') === "onlyserverowner")
+                await i.client.guilds.cache.forEach(async (g) => {
+                    await (await g.members.fetch(g.ownerId)).send(i.options.getString('내용'));
+                    count++;
+                });
+
+                if (i.options.getString('전송대상') === "voicechannel")
+                    
+                await i.client.guilds.cache.forEach(async (g) => {
+                    const c = await getVoiceConnection(g.id);
+                    if (!c) {
+                        await (await g.members.fetch(g.ownerId)).send(i.options.getString('내용'));
+                        count++;
+                    }
+                    else {
+                        await (await g.channels.fetch(c.joinConfig.channelId)).send(i.options.getString('내용'));
+                        count++;
+                    }
+                });
+
+                i.editReply({content:`${count}개의 ${i.options.getString('전송대상')==="voicechannel"?"음성채널에":"서버주인에게"} 메세지를 전송했습니다`});
+
+                break;
+            }
+            case "들어가":{
+                /**@type {import('discord.js').ChannelType.GuildVoice} */
+                        const vc = i.options.getChannel('음성채널');
+
+        const conn = joinVoiceChannel({
+            channelId: vc.id,
+            guildId: vc.guild.id,
+            adapterCreator: vc.guild.voiceAdapterCreator
+        });
+
+        players[i.guildId] ??= createAudioPlayer();
+        conn.subscribe(players[i.guildId]);
+        targetTextChannel[i.guildId] = i.options.getChannel('채팅채널').id;
+        await i.guild.members.me.voice?.setDeaf(true);
+
+        return i.reply({ content: `음성 채널에 접속했습니다. vcid:${vc.id}, tcid:${i.options.getChannel('채팅채널').id}`, ephemeral: true });
+    
+            }
+            default:
+                break;
         }
     }
 });
