@@ -1,9 +1,10 @@
 "use strict";
 require('dotenv').config();
-const fs   = require('fs');
-const path = require('path');
-const util = require('util');
-const {replaceall}=require("./replace.js");
+const fs     = require('fs');
+const path   = require('path');
+const util   = require('util');
+const crypto = require('crypto');
+const { replaceall } = require("./replace.js");
 
 const db = require('./db.js');
 
@@ -96,7 +97,12 @@ async function processQueue(guildId, channelId) {
         const file = `./tts_${Date.now()}_${guildId}.mp3`;
         await util.promisify(fs.writeFile)(file, res.audioContent, 'binary');
 
-        players[guildId].play(createAudioResource(file));
+        try {
+            players[guildId].play(createAudioResource(file));
+        } catch (e) {
+            fs.existsSync(file) && fs.unlinkSync(file);
+            throw e;
+        }
 
         players[guildId].once(AudioPlayerStatus.Idle, () => {
             fs.existsSync(file) && fs.unlinkSync(file);
@@ -113,8 +119,8 @@ async function processQueue(guildId, channelId) {
 
 async function log(filepath, text) {
     let data = '';
-    try { data = fs.readFileSync(filepath, 'utf8'); } catch { /* 파일 없으면 빈 문자열 */ }
-    fs.writeFileSync(filepath, data + '\n' + text);
+    try { data = await fs.promises.readFile(filepath, 'utf8'); } catch { /* 파일 없으면 빈 문자열 */ }
+    await fs.promises.writeFile(filepath, data + '\n' + text);
 }
 
 /* ===================== Slash Commands ===================== */
@@ -275,7 +281,11 @@ client.once(Events.ClientReady, async () => {
 /* ===================== Guild Join ===================== */
 
 client.on(Events.GuildCreate, async (guild) => {
-    (await guild.members.fetch(guild.ownerId)).send('저는 TTS봇입니다. 추가되었어요!');
+    try {
+        await (await guild.members.fetch(guild.ownerId)).send('저는 TTS봇입니다. 추가되었어요!');
+    } catch (e) {
+        console.error(`[GuildCreate] DM 전송 실패 (${guild.id}):`, e);
+    }
 });
 
 /* ===================== Interaction ===================== */
@@ -369,9 +379,10 @@ client.on(Events.InteractionCreate, async i => {
         await i.deferReply({ flags: ['Ephemeral'] });
 
         if (i.options.getSubcommand() === '공유') {
-            const userdata = await db.getUserConfig(i.guild.id, i.user.id);
-            await db.saveShareConfig(i.guild.id, i.user.id, userdata);
-            return i.editReply(`공유가 끝났습니다. 당신의 설정을 다른사람이 적용하려면 \`${i.user.id}\`를 입력하세요.`);
+            const userdata  = await db.getUserConfig(i.guild.id, i.user.id);
+            const shareCode = crypto.randomBytes(5).toString('hex');
+            await db.saveShareConfig(i.guild.id, shareCode, userdata);
+            return i.editReply(`공유가 끝났습니다. 당신의 설정을 다른사람이 적용하려면 \`${shareCode}\`를 입력하세요.`);
         }
 
         if (i.options.getSubcommand() === '적용') {
