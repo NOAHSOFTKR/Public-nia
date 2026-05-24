@@ -19,6 +19,9 @@ function replaceall (text){
         .replaceAll("ㄱㅅㄲ","개새끼")
         .replaceAll("ㅗ","엿")
         .replaceAll("ㅅㅅ","섹스")
+.replaceAll("ㄱㅊ","괜찮")
+.replaceAll("ㄲㅂ","까비")
+.replaceAll("ㅂㅂ","바바")
         .replaceAll("ㅊㅇ","차이");
 }
 
