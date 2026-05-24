@@ -22,6 +22,7 @@ function replaceall (text){
 .replaceAll("ㄱㅊ","괜찮")
 .replaceAll("ㄲㅂ","까비")
 .replaceAll("ㅂㅂ","바바")
+.replaceAll("ㄷㄷ","덜덜")
         .replaceAll("ㅊㅇ","차이");
 }
 
