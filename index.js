@@ -3,6 +3,7 @@ require('dotenv').config();
 const fs   = require('fs');
 const path = require('path');
 const util = require('util');
+const {replace}=require("./replace.js");
 
 const db = require('./db.js');
 
