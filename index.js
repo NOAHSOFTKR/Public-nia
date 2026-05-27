@@ -80,7 +80,6 @@ async function processQueue(guildId, channelId) {
     if (file) {
         players[guildId].play(createAudioResource(file));
         players[guildId].once(AudioPlayerStatus.Idle, () => {
-            fs.existsSync(ttsfile) && fs.unlinkSync(ttsfile);
             playing[guildId] = false;
             processQueue(guildId, channelId);
         });
@@ -103,7 +102,7 @@ async function processQueue(guildId, channelId) {
     try {
         const [res] = await ttsClient.synthesizeSpeech(request);
         const ttsfile = `./tts_${Date.now()}_${guildId}.mp3`;
-        await util.promisify(fs.writeFile)(file, res.audioContent, 'binary');
+        await util.promisify(fs.writeFile)(ttsfile, res.audioContent, 'binary');
 
         try {
             players[guildId].play(createAudioResource(ttsfile));
