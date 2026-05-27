@@ -15,6 +15,7 @@ function replaceall(text) {
         .replaceAll("ㄳ", "감사")
         .replaceAll("ㄱㅅ", "감사")
         .replaceAll("ㄱㄴㄲ", "그니까")
+        .replaceAll("ㅆㄱㄴ","쌉가능")
         .replaceAll("ㄱㄴ", "가능")
         .replaceAll("ㄱㅅㄲ", "개새끼")
         .replaceAll("ㅗ", "엿")
