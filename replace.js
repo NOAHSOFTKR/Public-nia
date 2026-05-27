@@ -3,7 +3,7 @@ function replaceall(text) {
         .replace(/[*_~`]/g, '')
         .replace(/<?:[A-Za-z0-9_]+:(\d{17,19})?\>?/g, '이모지를 보냈어요.')
         .replace(/https?:\/\/[^\s]+/g, "링크를 보냈어요.")
-        .replace(/#{1,3}67/,"")
+        .replace(/#{1,3} 67/,"")
         .replaceAll("ㅈㅁㅊ", "진미채") // 어쩔 ㅋㅋ
         .replaceAll("ㅎㅇ", "하이")
         .replaceAll("ㅅㄲ", "새끼")
