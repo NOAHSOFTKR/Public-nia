@@ -11,7 +11,7 @@ function replaceall(text) {
         .replaceAll("ㄹㅇ", "리얼")
         .replaceAll("ㄱㄷ", "기달")
         .replaceAll("ㅁㅊ", "미친")
-        //.replaceAll("진미채", "진미채퍼블") // 어쩔 ㅋㅋ
+        .replaceAll("ㅈㅁㅊ", "진미채") // 어쩔 ㅋㅋ
         .replaceAll("ㅈㅉ", "저쩔")
         .replaceAll("ㅈㄴ", "존나")
         .replaceAll("ㅇㅉ", "어쩔")
