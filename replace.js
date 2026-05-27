@@ -9,6 +9,7 @@ function replaceall(text) {
         .replaceAll("ㅅㅂ", "시발")
         .replaceAll("ㅇㄴ", "아니")
         .replaceAll("ㅈㄴ", "존나")
+        .replaceAll("ㅇㅉ","어쩔")
         .replaceAll("ㅅㄱ", "수고")
         .replaceAll("ㅂㅅ", "병신")
         .replaceAll("ㅄ", "병신")
