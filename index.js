@@ -76,7 +76,15 @@ async function processQueue(guildId, channelId) {
     playing[guildId] = true;
     players[guildId] ??= createAudioPlayer();
 
-    const { text, userId } = queue.shift();
+    const { text, userId, file } = queue.shift();
+    if (file) {
+        players[guildId].play(createAudioResource(file));
+        players[guildId].once(AudioPlayerStatus.Idle, () => {
+            fs.existsSync(ttsfile) && fs.unlinkSync(ttsfile);
+            playing[guildId] = false;
+            processQueue(guildId, channelId);
+        });
+    }else{
     const setting = await db.getUserConfig(guildId, userId);
 
     const request = {
@@ -94,24 +102,25 @@ async function processQueue(guildId, channelId) {
 
     try {
         const [res] = await ttsClient.synthesizeSpeech(request);
-        const file = `./tts_${Date.now()}_${guildId}.mp3`;
+        const ttsfile = `./tts_${Date.now()}_${guildId}.mp3`;
         await util.promisify(fs.writeFile)(file, res.audioContent, 'binary');
 
         try {
-            players[guildId].play(createAudioResource(file));
+            players[guildId].play(createAudioResource(ttsfile));
         } catch (e) {
-            fs.existsSync(file) && fs.unlinkSync(file);
+            fs.existsSync(ttsfile) && fs.unlinkSync(ttsfile);
             throw e;
         }
 
         players[guildId].once(AudioPlayerStatus.Idle, () => {
-            fs.existsSync(file) && fs.unlinkSync(file);
+            fs.existsSync(ttsfile) && fs.unlinkSync(ttsfile);
             playing[guildId] = false;
             processQueue(guildId, channelId);
         });
     } catch (e) {
         console.error(e);
         playing[guildId] = false;
+    }
     }
 }
 
@@ -504,6 +513,9 @@ client.on(Events.MessageCreate, async (msg) => {
 
     if (msg.attachments.size > 0) {
         getQueue(msg.guildId, msg.channel.id).push({ text: '파일을 보냈어요', userId: msg.author.id });
+    }
+    if (msg.content.includes("67") {
+        getQueue(msg.guildId, msg.channel.id).push();
     }
     getQueue(msg.guildId, msg.channel.id).push({ text, userId: msg.author.id });
     processQueue(msg.guildId, msg.channel.id);
