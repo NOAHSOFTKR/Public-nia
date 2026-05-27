@@ -515,7 +515,7 @@ client.on(Events.MessageCreate, async (msg) => {
         getQueue(msg.guildId, msg.channel.id).push({ text: '파일을 보냈어요', userId: msg.author.id });
     }
     if (msg.content.includes("67") {
-        getQueue(msg.guildId, msg.channel.id).push();
+        getQueue(msg.guildId, msg.channel.id).push({ file:"67.mp3" });
     }
     getQueue(msg.guildId, msg.channel.id).push({ text, userId: msg.author.id });
     processQueue(msg.guildId, msg.channel.id);
