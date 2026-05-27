@@ -510,6 +510,8 @@ client.on(Events.MessageCreate, async (msg) => {
 
     let text = replaceall(msg.content);
 
+    if (text.length === 0) return;
+
     if (msg.attachments.size > 0) {
         getQueue(msg.guildId, msg.channel.id).push({ text: '파일을 보냈어요', userId: msg.author.id });
     }
