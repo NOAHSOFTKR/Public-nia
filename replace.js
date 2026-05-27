@@ -4,6 +4,7 @@ function replaceall(text) {
         .replace(/<?:[A-Za-z0-9_]+:(\d{17,19})?\>?/g, '이모지를 보냈어요.')
         .replace(/https?:\/\/[^\s]+/g, "링크를 보냈어요.")
         .replace(/#{1,3}67/,"")
+        .replaceAll("ㅈㅁㅊ", "진미채") // 어쩔 ㅋㅋ
         .replaceAll("ㅎㅇ", "하이")
         .replaceAll("ㅅㄲ", "새끼")
         .replaceAll("ㅂㅇ", "바이")
@@ -12,7 +13,6 @@ function replaceall(text) {
         .replaceAll("ㄹㅇ", "리얼")
         .replaceAll("ㄱㄷ", "기달")
         .replaceAll("ㅁㅊ", "미친")
-        .replaceAll("ㅈㅁㅊ", "진미채") // 어쩔 ㅋㅋ
         .replaceAll("ㅈㅉ", "저쩔")
         .replaceAll("ㅈㄴ", "존나")
         .replaceAll("ㅇㅉ", "어쩔")
