@@ -143,6 +143,10 @@ const commands = [
         .setDescription('음성 채널에서 나옵니다.'),
 
     new SlashCommandBuilder()
+        .setName('스킵')
+        .setDescription('현재 재생 중인 TTS를 건너뜁니다.'),
+
+    new SlashCommandBuilder()
         .setName('설정공유')
         .setDescription('설정공유')
         .addSubcommand(sub => sub
@@ -330,6 +334,19 @@ client.on(Events.InteractionCreate, async i => {
         conn.destroy();
         delete targetTextChannel[i.guildId];
         return i.reply({ content: '퇴장했습니다.', ephemeral: true });
+    }
+
+    /* ── 스킵 ── */
+    if (i.commandName === '스킵') {
+        const conn = getVoiceConnection(i.guildId);
+        if (!conn) return i.reply({ content: '봇이 음성 채널에 없습니다.', ephemeral: true });
+        if (i.member.voice.channel?.id !== conn.joinConfig.channelId)
+            return i.reply({ content: '봇과 같은 음성채널에 있어야 합니다.', ephemeral: true });
+        if (!playing[i.guildId])
+            return i.reply({ content: '현재 재생 중인 TTS가 없습니다.', ephemeral: true });
+
+        players[i.guildId].stop();
+        return i.reply({ content: '스킵했습니다.', ephemeral: true });
     }
 
     /* ── 이동 ── */
